@@ -139,9 +139,9 @@ alloy-provisioner does **not** load a `.env` file itself; it only reads variable
 | Variable                  | Purpose                                                                                                |
 | ------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `ALLOY_BLUEPRINT_DIR`     | Blueprint directory (overridden by `-blueprint-dir`).                                                  |
-| `ALLOY_REGISTRY`          | Alloy registry URL when using `-pull` (overridden by `-registry`).                                       |
-| `ALLOY_REGISTRY_USERNAME` | Username for private Alloy registry (when `-pull`).                                                      |
-| `ALLOY_REGISTRY_PASSWORD` | Password or token for private Alloy registry (when `-pull`).                                             |
+| `ALLOY_REGISTRY`          | Alloy registry URL when using `-pull` (overridden by `-registry`).                                     |
+| `ALLOY_REGISTRY_USERNAME` | Username for private Alloy registry (when `-pull`).                                                    |
+| `ALLOY_REGISTRY_PASSWORD` | Password or token for private Alloy registry (when `-pull`).                                           |
 | Any other vars            | Merged into blueprint global vars; useful for task expansion (e.g. `GITLAB_TOKEN`, `SDK_DESTINATION`). |
 
 Restrict permissions on the env file so only your user can read it: `chmod 600 $HOME/.alloy-it/.env`.
@@ -167,11 +167,11 @@ alloy-provisioner -pull -registry ghcr.io/myorg -repository myproject/my-bluepri
 | --------------------- | ------------------------------------------------------------------------------------------- | ------------------------ |
 | `-blueprint-dir`      | Path to the blueprint directory (contains `manifest.yml`). Overrides `ALLOY_BLUEPRINT_DIR`. | `$HOME/.alloy-it` or `.` |
 | `ALLOY_BLUEPRINT_DIR` | Same as `-blueprint-dir`; flag takes precedence.                                            | —                        |
-| `-pull`               | Pull blueprint from Alloy registry before running.                                            | `false`                  |
-| `-registry`           | Alloy registry URL. **Required when `-pull` is set.** Overrides `ALLOY_REGISTRY`.             | (none)                   |
+| `-pull`               | Pull blueprint from Alloy registry before running.                                          | `false`                  |
+| `-registry`           | Alloy registry URL. **Required when `-pull` is set.** Overrides `ALLOY_REGISTRY`.           | (none)                   |
 | `ALLOY_REGISTRY`      | Same as `-registry`; flag takes precedence.                                                 | —                        |
-| `-repository`         | Alloy repository path (e.g. `project/blueprint-name`). **Required when `-pull` is set.**      | (none)                   |
-| `-tag`                | Alloy artifact tag.                                                                           | `latest`                 |
+| `-repository`         | Alloy repository path (e.g. `project/blueprint-name`). **Required when `-pull` is set.**    | (none)                   |
+| `-tag`                | Alloy artifact tag.                                                                         | `latest`                 |
 | `-version`            | Print version and exit.                                                                     | —                        |
 | `-config`             | **Deprecated.** Use `-blueprint-dir` or `ALLOY_BLUEPRINT_DIR` instead.                      | (none)                   |
 
