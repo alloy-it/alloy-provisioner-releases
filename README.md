@@ -139,24 +139,39 @@ alloy-provisioner does **not** load a `.env` file itself; it only reads variable
 | Variable                  | Purpose                                                                                                |
 | ------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `ALLOY_BLUEPRINT_DIR`     | Blueprint directory (overridden by `-blueprint-dir`).                                                  |
-| `ALLOY_REGISTRY`          | Alloy registry URL when using `-pull` (overridden by `-registry`).                                     |
-| `ALLOY_REGISTRY_USERNAME` | Username for private Alloy registry (when `-pull`).                                                    |
-| `ALLOY_REGISTRY_PASSWORD` | Password or token for private Alloy registry (when `-pull`).                                           |
+| `ALLOY_REGISTRY`          | Registry URL when using `-pull` (overridden by `-registry`). Default: `api.alloy-it.io` (public community registry). |
+| `ALLOY_REGISTRY_USERNAME` | Username for a **private** registry (only needed when pulling from non-public registries).              |
+| `ALLOY_REGISTRY_PASSWORD` | Password or token for a **private** registry (only needed when pulling from non-public registries).    |
 | Any other vars            | Merged into blueprint global vars; useful for task expansion (e.g. `GITLAB_TOKEN`, `SDK_DESTINATION`). |
 
 Restrict permissions on the env file so only your user can read it: `chmod 600 $HOME/.alloy-it/.env`.
 
-### Pull blueprint from Alloy registry, then run
+### Pull blueprint from registry, then run
+
+The provisioner defaults to the **public community registry** at `api.alloy-it.io`. No credentials are needed to pull community blueprints from this registry (see [alloy-publisher](https://github.com/alloy-it/alloy-publisher) for how blueprints are published there).
+
+**Using the default community registry (no auth):**
 
 ```bash
-./alloy-provisioner -pull -registry <registry-url> -repository <project/blueprint-name> [-tag <tag>]
+# Pull a community blueprint; only -repository is required (registry defaults to api.alloy-it.io)
+alloy-provisioner -pull -repository community/raspberry-pi
+alloy-provisioner -pull -repository community/esp32 -tag latest
 ```
 
-Example (with env file for registry auth):
+Repository path format is `project/blueprint-name`, e.g. `community/raspberry-pi`, `community/esp32`, `community/nrf91`.
+
+**Using a custom registry (e.g. private):**
+
+```bash
+# Override registry via flag or ALLOY_REGISTRY; set ALLOY_REGISTRY_USERNAME / ALLOY_REGISTRY_PASSWORD if the registry is private
+alloy-provisioner -pull -registry <registry-url> -repository <project/blueprint-name> [-tag <tag>]
+```
+
+Example with env file for private registry auth:
 
 ```bash
 set -a && source "$HOME/.alloy-it/.env" && set +a
-alloy-provisioner -pull -registry ghcr.io/myorg -repository myproject/my-blueprint -tag latest
+alloy-provisioner -pull -registry my-registry.example.com -repository myproject/my-blueprint -tag latest
 ```
 
 ---
@@ -167,11 +182,11 @@ alloy-provisioner -pull -registry ghcr.io/myorg -repository myproject/my-bluepri
 | --------------------- | ------------------------------------------------------------------------------------------- | ------------------------ |
 | `-blueprint-dir`      | Path to the blueprint directory (contains `manifest.yml`). Overrides `ALLOY_BLUEPRINT_DIR`. | `$HOME/.alloy-it` or `.` |
 | `ALLOY_BLUEPRINT_DIR` | Same as `-blueprint-dir`; flag takes precedence.                                            | —                        |
-| `-pull`               | Pull blueprint from Alloy registry before running.                                          | `false`                  |
-| `-registry`           | Alloy registry URL. **Required when `-pull` is set.** Overrides `ALLOY_REGISTRY`.           | (none)                   |
-| `ALLOY_REGISTRY`      | Same as `-registry`; flag takes precedence.                                                 | —                        |
-| `-repository`         | Alloy repository path (e.g. `project/blueprint-name`). **Required when `-pull` is set.**    | (none)                   |
-| `-tag`                | Alloy artifact tag.                                                                         | `latest`                 |
+| `-pull`               | Pull blueprint from OCI registry before running.                                           | `false`                  |
+| `-registry`           | OCI registry URL. Overrides `ALLOY_REGISTRY`.                                               | `api.alloy-it.io`   |
+| `ALLOY_REGISTRY`      | Same as `-registry`; flag takes precedence.                                                | `api.alloy-it.io`   |
+| `-repository`         | Repository path (e.g. `community/raspberry-pi`). **Required when `-pull` is set.**         | (none)                   |
+| `-tag`                | OCI artifact tag.                                                                          | `latest`                 |
 | `-version`            | Print version and exit.                                                                     | —                        |
 | `-config`             | **Deprecated.** Use `-blueprint-dir` or `ALLOY_BLUEPRINT_DIR` instead.                      | (none)                   |
 
