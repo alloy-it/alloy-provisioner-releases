@@ -2,6 +2,8 @@
 
 Public release repository for **alloy-provisioner**: the Alloy guest VM provisioning engine. Binaries and packages are published here for download; the source code lives in a separate private repository.
 
+For a full walkthrough of features and usage see the **[User Guide](docs/user-guide.md)**.
+
 ---
 
 ## Compatibility
@@ -136,13 +138,13 @@ alloy-provisioner does **not** load a `.env` file itself; it only reads variable
 
 #### **Variables the tool reads from the environment**
 
-| Variable                  | Purpose                                                                                                |
-| ------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `ALLOY_BLUEPRINT_DIR`     | Blueprint directory (overridden by `-blueprint-dir`).                                                  |
+| Variable                  | Purpose                                                                                                              |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `ALLOY_BLUEPRINT_DIR`     | Blueprint directory (overridden by `-blueprint-dir`).                                                                |
 | `ALLOY_REGISTRY`          | Registry URL when using `-pull` (overridden by `-registry`). Default: `api.alloy-it.io` (public community registry). |
-| `ALLOY_REGISTRY_USERNAME` | Username for a **private** registry (only needed when pulling from non-public registries).              |
-| `ALLOY_REGISTRY_PASSWORD` | Password or token for a **private** registry (only needed when pulling from non-public registries).    |
-| Any other vars            | Merged into blueprint global vars; useful for task expansion (e.g. `GITLAB_TOKEN`, `SDK_DESTINATION`). |
+| `ALLOY_REGISTRY_USERNAME` | Username for a **private** registry (only needed when pulling from non-public registries).                           |
+| `ALLOY_REGISTRY_PASSWORD` | Password or token for a **private** registry (only needed when pulling from non-public registries).                  |
+| Any other vars            | Merged into blueprint global vars; useful for task expansion (e.g. `GITLAB_TOKEN`, `SDK_DESTINATION`).               |
 
 Restrict permissions on the env file so only your user can read it: `chmod 600 $HOME/.alloy-it/.env`.
 
@@ -182,11 +184,11 @@ alloy-provisioner -pull -registry my-registry.example.com -repository myproject/
 | --------------------- | ------------------------------------------------------------------------------------------- | ------------------------ |
 | `-blueprint-dir`      | Path to the blueprint directory (contains `manifest.yml`). Overrides `ALLOY_BLUEPRINT_DIR`. | `$HOME/.alloy-it` or `.` |
 | `ALLOY_BLUEPRINT_DIR` | Same as `-blueprint-dir`; flag takes precedence.                                            | —                        |
-| `-pull`               | Pull blueprint from Alloy Imageregistry before running.                                           | `false`                  |
-| `-registry`           | Alloy Imageregistry URL. Overrides `ALLOY_REGISTRY`.                                               | `api.alloy-it.io`   |
-| `ALLOY_REGISTRY`      | Same as `-registry`; flag takes precedence.                                                | `api.alloy-it.io`   |
-| `-repository`         | Repository path (e.g. `community/raspberry-pi`). **Required when `-pull` is set.**         | (none)                   |
-| `-tag`                | Alloy Imageartifact tag.                                                                          | `latest`                 |
+| `-pull`               | Pull blueprint from Alloy Imageregistry before running.                                     | `false`                  |
+| `-registry`           | Alloy Imageregistry URL. Overrides `ALLOY_REGISTRY`.                                        | `api.alloy-it.io`        |
+| `ALLOY_REGISTRY`      | Same as `-registry`; flag takes precedence.                                                 | `api.alloy-it.io`        |
+| `-repository`         | Repository path (e.g. `community/raspberry-pi`). **Required when `-pull` is set.**          | (none)                   |
+| `-tag`                | Alloy Imageartifact tag.                                                                    | `latest`                 |
 | `-version`            | Print version and exit.                                                                     | —                        |
 | `-config`             | **Deprecated.** Use `-blueprint-dir` or `ALLOY_BLUEPRINT_DIR` instead.                      | (none)                   |
 
