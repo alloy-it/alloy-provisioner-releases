@@ -158,18 +158,18 @@
    or hosted service, please contact Melqart Systems to obtain a
    commercial license:
 
-       Email:   contact@alloy.dev
-       Website: https://alloy.dev
+       Email:   contact@melqart-systems.com
+       Website: https://melqart-systems.com
 
 ─────────────────────────────────────────────────────────────────────────────
 
    WHAT THIS MEANS IN PLAIN LANGUAGE
 
    You CAN:
-   - Use alloy-provisioner freely for your own embedded software projects
+   - Use alloy-provisioner freely for your own software projects
    - Use it in your company's internal CI/CD pipelines
    - Modify it and distribute your modifications under this same license
-   - Build commercial embedded software products that use alloy-provisioner
+   - Build commercial software products that use alloy-provisioner
      as a tool (the restriction applies to selling the provisioner itself
      as a service, not to the firmware or software you build with it)
 
@@ -181,4 +181,4 @@
    - White-label or rebrand alloy-provisioner and sell it as your own
 
    If you are unsure whether your use case is permitted, contact us at
-   contact@alloy.dev before proceeding.
+   contact@melqart-systems.com before proceeding.
