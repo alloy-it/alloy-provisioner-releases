@@ -184,8 +184,8 @@ alloy-provisioner -pull -registry my-registry.example.com -repository myproject/
 | --------------------- | ------------------------------------------------------------------------------------------- | ------------------------ |
 | `-blueprint-dir`      | Path to the blueprint directory (contains `manifest.yml`). Overrides `ALLOY_BLUEPRINT_DIR`. | `$HOME/.alloy-it` or `.` |
 | `ALLOY_BLUEPRINT_DIR` | Same as `-blueprint-dir`; flag takes precedence.                                            | —                        |
-| `-pull`               | Pull blueprint from Alloy Imageregistry before running.                                     | `false`                  |
-| `-registry`           | Alloy Imageregistry URL. Overrides `ALLOY_REGISTRY`.                                        | `api.alloy-it.io`        |
+| `-pull`               | Pull blueprint from Alloy Blueprint Hub before running.                                     | `false`                  |
+| `-registry`           | Alloy Blueprint Hub URL. Overrides `ALLOY_REGISTRY`.                                        | `api.alloy-it.io`        |
 | `ALLOY_REGISTRY`      | Same as `-registry`; flag takes precedence.                                                 | `api.alloy-it.io`        |
 | `-repository`         | Repository path (e.g. `community/raspberry-pi`). **Required when `-pull` is set.**          | (none)                   |
 | `-tag`                | Alloy Imageartifact tag.                                                                    | `latest`                 |

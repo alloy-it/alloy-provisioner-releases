@@ -51,7 +51,7 @@ version: "1.0.0"
 description: "Example blueprint."
 
 variables:
-  VM_USER: "vagrant"
+  DEV_USERNAME: "vagrant"
   TOOLCHAIN_DEST: "/opt/my-toolchain"
 
 toolchains:
@@ -403,7 +403,7 @@ variables:
 Environment variables present in the process environment at runtime are merged into the variable set. This allows overriding manifest variables or injecting secrets:
 
 ```bash
-export VM_USER=myuser
+export DEV_USERNAME=myuser
 export GITLAB_TOKEN=glpat-xxx
 alloy-provisioner
 ```
@@ -702,7 +702,7 @@ name: "My Dev Environment"
 version: "1.0.0"
 
 variables:
-  VM_USER: "myuser"
+  DEV_USERNAME: "myuser"
 
 run_order:
   - "00-system.yml"
