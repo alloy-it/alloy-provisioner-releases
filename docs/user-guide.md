@@ -323,7 +323,8 @@ These options are available on **all** task actions:
 | `name`       | Human-readable task identifier (required).                                                                                                      |
 | `creates`    | If this path exists, skip the task entirely before any other check. Most efficient idempotency guard.                                           |
 | `always_run` | Set to `true` to bypass all idempotency checks and always execute.                                                                              |
-| `skip_if`    | Shell expression: skip the task if exit code is 0. E.g. `skip_if: "[ \"$ALLOY_BACKEND\" = \"wsl2\" ]"`.                                         |
+| `skip_if`    | Shell expression: skip the task if exit code is 0.                                                                                              |
+| `exclude`    | Skip on named environments. Built-in tags: `docker`, `wsl2`. See [Environment-Based Exclusion](#environment-based-exclusion).                   |
 | `run_as`     | Execute as this user (only applies to `run_command`).                                                                                           |
 | `owner`      | Set ownership of `dest` or `file` after task success. Format: `user:group`. Applied recursively.                                                |
 | `mode`       | Set permissions of `dest` or `file` after task success. Accepts octal (`0755`) or symbolic (`USER_RWX GROUP_RX OTHER_RX`). Applied recursively. |
@@ -442,6 +443,36 @@ The provisioner detects the current system architecture (`amd64` or `arm64`) aut
 The matching architecture block is merged into the task before execution. Fields present in `per_arch` override the top-level values. Fields not present in `per_arch` keep their top-level values.
 
 Supported fields in `per_arch`: `url`, `sha256`, `command`, `source`.
+
+---
+
+### Environment-Based Exclusion
+
+The `exclude` field skips a task when a named environment tag is active. This is cleaner than `skip_if` for well-known environments because it requires no shell scripting.
+
+**Built-in tags:**
+
+| Tag      | How to activate                            |
+| :------- | :----------------------------------------- |
+| `docker` | `--docker` flag or `ALLOY_ENV_DOCKER=1`    |
+| `wsl2`   | `--wsl2` flag or `ALLOY_ENV_WSL2=1`        |
+
+When running through `alloy-host`, the WSL2 backend automatically passes `--wsl2` to the provisioner.
+
+```yaml
+- name: "Install udev rules"
+  action: "udev_rules"
+  rule_file: "99-my-device.rules"
+  exclude: [docker, wsl2]   # udev doesn't work in Docker or WSL2
+
+- name: "Register QEMU binfmt"
+  action: "register_binfmt"
+  architecture: "arm"
+  interpreter: "/usr/bin/qemu-arm-static"
+  exclude: [docker]          # requires privileged mode; skip in Docker
+```
+
+`exclude` and `skip_if` are checked independently — either condition alone is enough to skip the task.
 
 ---
 
