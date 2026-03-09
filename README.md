@@ -81,6 +81,16 @@ alloy-provisioner -version
 
 Optional: verify checksums using `checksums.txt` from the same release before unpacking or installing.
 
+### Checking for updates
+
+To see whether a newer release is available, run:
+
+```bash
+alloy-provisioner update-check
+```
+
+If an update is available, download the new `.deb` or archive from the [releases page](https://github.com/alloy-it/alloy-provisioner-releases/releases/latest) (see [Download & Unpack](#download--unpack) above). When using alloy-host, re-provisioning or creating a new dev-vm will typically pull the provisioner version configured by the blueprint or the latest from this repo.
+
 ---
 
 ## Usage
