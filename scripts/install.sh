@@ -194,11 +194,11 @@ if [ -z "$INSTALLED_PATH" ]; then
   warn "Make sure ${INSTALL_DIR} is in your PATH, e.g. add to ~/.bashrc:"
   warn "  export PATH=\"\$PATH:${INSTALL_DIR}\""
 else
-  INSTALLED_VERSION="$("$INSTALLED_PATH" -version 2>&1 || true)"
+  INSTALLED_VERSION="$("$INSTALLED_PATH" --version 2>&1 || true)"
   printf "\n${BOLD}${GREEN}Installation complete!${RESET}\n"
   success "Binary : ${INSTALLED_PATH}"
   success "Version: ${INSTALLED_VERSION}"
 fi
 
 printf "\n${CYAN}Get started:${RESET}\n"
-printf "  alloy-provisioner -help\n\n"
+printf "  alloy-provisioner --help\n\n"
