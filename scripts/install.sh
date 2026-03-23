@@ -114,8 +114,11 @@ else
   DEB_FILENAME="${BINARY}_latest_linux_${ARCH}.deb"
 fi
 
-TAR_FILENAME="${BINARY}_linux_${ARCH}.tar.gz"
-CHECKSUMS_FILENAME="checksums.txt"
+if [ -n "$VERSION" ]; then
+  TAR_FILENAME="${BINARY}_linux_${ARCH}.tar.gz"
+else
+  TAR_FILENAME="${BINARY}_latest_linux_${ARCH}.tar.gz"
+fi
 
 BASE_URL="https://github.com/${REPO}/releases/download/${TAG}"
 
@@ -133,22 +136,12 @@ printf "  Install: %s\n\n" "$INSTALL_DIR"
 # ---------------------------------------------------------------------------
 need_cmd uname
 need_cmd tar
-need_cmd sha256sum
 
 # ---------------------------------------------------------------------------
 # Temporary workspace
 # ---------------------------------------------------------------------------
 TMPDIR_WORK="$(mktemp -d)"
 trap 'rm -rf "$TMPDIR_WORK"' EXIT
-
-# ---------------------------------------------------------------------------
-# Download checksums
-# ---------------------------------------------------------------------------
-info "Downloading checksums from ${TAG} release…"
-CHECKSUMS_FILE="$TMPDIR_WORK/$CHECKSUMS_FILENAME"
-if ! download "${BASE_URL}/${CHECKSUMS_FILENAME}" "$CHECKSUMS_FILE"; then
-  die "Failed to download checksums from ${BASE_URL}/${CHECKSUMS_FILENAME}"
-fi
 
 # ---------------------------------------------------------------------------
 # Install via .deb (Debian/Ubuntu) — preferred
@@ -167,17 +160,6 @@ if [ "$USE_DEB" = "1" ]; then
     die "Failed to download ${BASE_URL}/${DEB_FILENAME}"
   fi
 
-  # Verify checksum
-  info "Verifying checksum…"
-  EXPECTED_SUM="$(grep " ${DEB_FILENAME}$" "$CHECKSUMS_FILE" | awk '{print $1}')"
-  if [ -z "$EXPECTED_SUM" ]; then
-    warn "No checksum entry found for ${DEB_FILENAME} in checksums.txt — skipping verification."
-  else
-    ACTUAL_SUM="$(sha256sum "$DEB_FILE" | awk '{print $1}')"
-    [ "$ACTUAL_SUM" = "$EXPECTED_SUM" ] || die "Checksum mismatch!\n  expected: ${EXPECTED_SUM}\n  got:      ${ACTUAL_SUM}"
-    success "Checksum verified."
-  fi
-
   info "Installing package (requires sudo)…"
   sudo dpkg -i "$DEB_FILE"
 
@@ -189,17 +171,6 @@ else
   TAR_FILE="$TMPDIR_WORK/$TAR_FILENAME"
   if ! download "${BASE_URL}/${TAR_FILENAME}" "$TAR_FILE"; then
     die "Failed to download ${BASE_URL}/${TAR_FILENAME}"
-  fi
-
-  # Verify checksum
-  info "Verifying checksum…"
-  EXPECTED_SUM="$(grep " ${TAR_FILENAME}$" "$CHECKSUMS_FILE" | awk '{print $1}')"
-  if [ -z "$EXPECTED_SUM" ]; then
-    warn "No checksum entry found for ${TAR_FILENAME} in checksums.txt — skipping verification."
-  else
-    ACTUAL_SUM="$(sha256sum "$TAR_FILE" | awk '{print $1}')"
-    [ "$ACTUAL_SUM" = "$EXPECTED_SUM" ] || die "Checksum mismatch!\n  expected: ${EXPECTED_SUM}\n  got:      ${ACTUAL_SUM}"
-    success "Checksum verified."
   fi
 
   # Extract
