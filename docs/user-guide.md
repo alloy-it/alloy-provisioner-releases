@@ -712,13 +712,25 @@ sha256sum -c checksums.txt --ignore-missing
 
 The public registry at `api.alloy-it.io` hosts community blueprints. No credentials required.
 
-Pull a blueprint to `~/.alloy-it/` (the default blueprint directory):
+First, browse what's available:
 
 ```bash
-alloy-provisioner clone community/raspberry-pi
+alloy-provisioner clone --list community
 ```
 
-This downloads the blueprint files to `~/.alloy-it/` and prints the path.
+Then clone a blueprint to a local directory and inspect it before installing:
+
+```bash
+alloy-provisioner clone community/raspberry-pi/raspberry-pi-5:1.0.3 --output ./my-blueprint
+# inspect the files, then:
+sudo alloy-provisioner install --blueprint-dir ./my-blueprint
+```
+
+Or pull and run immediately with `install`:
+
+```bash
+sudo alloy-provisioner install community/raspberry-pi/raspberry-pi-5:1.0.3
+```
 
 #### **Option B: Write your own blueprint**
 
@@ -803,21 +815,17 @@ sudo alloy-provisioner install community/nrf91:1.0.13
 sudo alloy-provisioner install myproject/my-blueprint --registry my-registry.example.com
 ```
 
-#### Pull only, without running (`clone` subcommand)
+#### Discover and clone blueprints
 
 ```bash
-# Pull blueprint files to ~/.alloy-it without running
-alloy-provisioner clone community/raspberry-pi
+# List all available community blueprints (no auth required)
+alloy-provisioner clone --list community
 
-# Inspect the downloaded blueprint, then run manually
-sudo alloy-provisioner
-```
+# Clone blueprint files to a local directory without running
+alloy-provisioner clone community/nordic/nrf91:1.1.3 --output ./my-blueprint
 
-#### Pull then run (legacy `-pull` flag)
-
-```bash
-sudo alloy-provisioner -pull -repository community/raspberry-pi
-sudo alloy-provisioner -pull -repository community/nrf91 -tag 1.0.13
+# Inspect the files, then run
+sudo alloy-provisioner install --blueprint-dir ./my-blueprint
 ```
 
 ### Step 5: Re-run and Re-provision
@@ -861,11 +869,16 @@ sudo alloy-provisioner install community/raspberry-pi
 
 ### CLI Subcommands
 
-| Command                                  | Description                                          |
-| ---------------------------------------- | ---------------------------------------------------- |
-| `alloy-provisioner`                      | Run provisioning from the local blueprint directory. |
-| `alloy-provisioner install <name[:tag]>` | Pull blueprint from registry and run it.             |
-| `alloy-provisioner clone <name[:tag]>`   | Pull blueprint from registry without running it.     |
+| Command                                     | Description                                                          |
+| ------------------------------------------- | -------------------------------------------------------------------- |
+| `alloy-provisioner`                         | Run provisioning from the local blueprint directory.                 |
+| `alloy-provisioner install <name[:tag]>`    | Pull blueprint from registry and run it immediately.                 |
+| `alloy-provisioner clone <name[:tag]>`      | Pull blueprint files locally without running them.                   |
+| `alloy-provisioner clone --list <project>`  | List all blueprints in a registry project (no auth for `community`). |
+| `alloy-provisioner catalog update`          | Clone/pull the alloy-catalog repo into `~/.alloy-it/catalog/`.       |
+| `alloy-provisioner catalog search <query>`  | Search toolchain descriptors by ID, name, or tag.                    |
+| `alloy-provisioner catalog info <id[@ver]>` | Show versions, providers, and platform assets for a toolchain.       |
+| `alloy-provisioner update-check`            | Check whether a newer provisioner release is available.              |
 
 ### Flags and Parameters
 

@@ -158,49 +158,69 @@ alloy-provisioner does **not** load a `.env` file itself; it only reads variable
 
 Restrict permissions on the env file so only your user can read it: `chmod 600 $HOME/.alloy-it/.env`.
 
-### Pull blueprint from registry, then run
+### Browse and pull blueprints from the registry
 
-The provisioner defaults to the **public community registry** at `api.alloy-it.io`. No credentials are needed to pull community blueprints from this registry (see [alloy-publisher](https://github.com/alloy-it/alloy-publisher) for how blueprints are published there).
+The provisioner defaults to the **public community registry** at `api.alloy-it.io`. No credentials are needed for community blueprints.
 
-**Using the default community registry (no auth):**
-
-```bash
-# Pull a community blueprint; only -repository is required (registry defaults to api.alloy-it.io)
-alloy-provisioner -pull -repository community/raspberry-pi
-alloy-provisioner -pull -repository community/esp32 -tag latest
-```
-
-Repository path format is `project/blueprint-name`, e.g. `community/raspberry-pi`, `community/esp32`, `community/nrf91`.
-
-**Using a custom registry (e.g. private):**
+**Discover available blueprints:**
 
 ```bash
-# Override registry via flag or ALLOY_REGISTRY; set ALLOY_REGISTRY_USERNAME / ALLOY_REGISTRY_PASSWORD if the registry is private
-alloy-provisioner -pull -registry <registry-url> -repository <project/blueprint-name> [-tag <tag>]
+# List all community blueprints (no auth required)
+alloy-provisioner clone --list community
 ```
 
-Example with env file for private registry auth:
+**Clone (inspect before installing):**
+
+```bash
+alloy-provisioner clone community/nordic/nrf91:1.1.3 --output ./my-blueprint
+# inspect files, then:
+sudo alloy-provisioner install --blueprint-dir ./my-blueprint
+```
+
+**Pull and run immediately:**
+
+```bash
+sudo alloy-provisioner install community/nordic/nrf91:1.1.3
+sudo alloy-provisioner install community/raspberry-pi/raspberry-pi-5:1.0.3
+```
+
+**Using a custom/private registry:**
 
 ```bash
 set -a && source "$HOME/.alloy-it/.env" && set +a
-alloy-provisioner -pull -registry my-registry.example.com -repository myproject/my-blueprint -tag latest
+sudo alloy-provisioner install myproject/my-blueprint:1.0.0 --registry my-registry.example.com
 ```
 
+Legacy flags `-pull`, `-repository`, `-tag` are still accepted but the `install` and `clone` subcommands are preferred.
+
 ---
+
+## Subcommands
+
+| Subcommand                       | Description                                                               |
+| -------------------------------- | ------------------------------------------------------------------------- |
+| `install [name[:tag]]`           | Pull a blueprint from the registry and run it; or run a local blueprint with `--blueprint-dir`. |
+| `clone <name[:tag]>`             | Pull blueprint files locally without running them.                        |
+| `clone --list <project>`         | List all blueprints available in a registry project (no auth required for `community`). |
+| `catalog update`                 | Clone/pull the alloy-catalog repo into `~/.alloy-it/catalog/`.           |
+| `catalog search <query>`         | Search toolchain descriptors by ID, name, or tag.                        |
+| `catalog info <id[@version]>`    | Show versions, providers, and platform assets for a toolchain.           |
+| `update-check`                   | Check whether a newer provisioner release is available.                  |
 
 ## Flags and parameters
 
 | Flag / env            | Description                                                                                 | Default                  |
 | --------------------- | ------------------------------------------------------------------------------------------- | ------------------------ |
-| `-blueprint-dir`      | Path to the blueprint directory (contains `manifest.yml`). Overrides `ALLOY_BLUEPRINT_DIR`. | `$HOME/.alloy-it` or `.` |
-| `ALLOY_BLUEPRINT_DIR` | Same as `-blueprint-dir`; flag takes precedence.                                            | —                        |
-| `-pull`               | Pull blueprint from Alloy Blueprint Hub before running.                                     | `false`                  |
-| `-registry`           | Alloy Blueprint Hub URL. Overrides `ALLOY_REGISTRY`.                                        | `api.alloy-it.io`        |
-| `ALLOY_REGISTRY`      | Same as `-registry`; flag takes precedence.                                                 | `api.alloy-it.io`        |
-| `-repository`         | Repository path (e.g. `community/raspberry-pi`). **Required when `-pull` is set.**          | (none)                   |
-| `-tag`                | Alloy Imageartifact tag.                                                                    | `latest`                 |
-| `-version`            | Print version and exit.                                                                     | —                        |
-| `-config`             | **Deprecated.** Use `-blueprint-dir` or `ALLOY_BLUEPRINT_DIR` instead.                      | (none)                   |
+| `--blueprint-dir`     | Path to the blueprint directory (contains `manifest.yml`). Overrides `ALLOY_BLUEPRINT_DIR`. | `$HOME/.alloy-it` or `.` |
+| `ALLOY_BLUEPRINT_DIR` | Same as `--blueprint-dir`; flag takes precedence.                                           | —                        |
+| `--registry`          | Alloy registry URL for `install`/`clone`. Overrides `ALLOY_REGISTRY`.                      | `api.alloy-it.io`        |
+| `ALLOY_REGISTRY`      | Same as `--registry`; flag takes precedence.                                                | `api.alloy-it.io`        |
+| `--env-file`          | Path to a KEY=VALUE env file to load before provisioning.                                   | (none)                   |
+| `--dry-run`           | Validate blueprint and print execution plan without running tasks.                          | `false`                  |
+| `--docker`            | Activate the `docker` environment tag (skips tasks with `exclude: [docker]`).              | `false`                  |
+| `--wsl2`              | Activate the `wsl2` environment tag (skips tasks with `exclude: [wsl2]`).                  | `false`                  |
+| `--version`           | Print version and exit.                                                                     | —                        |
+| `-pull`, `-repository`, `-tag` | **Deprecated legacy flags.** Use `install`/`clone` subcommands instead.          | —                        |
 
 ---
 
