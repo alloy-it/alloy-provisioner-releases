@@ -59,14 +59,16 @@ curl -fsSL https://raw.githubusercontent.com/alloy-it/alloy-provisioner-releases
 Pass the version as a positional argument using `bash -s --`:
 
 ```bash
-curl -fsSL https://alloy-it.io/install.sh | bash -s -- 1.2.3
+curl -fsSL https://alloy-it.io/install.sh | bash -s -- 1.4.0
 ```
 
-Or via environment variable (both forms accept `1.2.3` and `v1.2.3`):
+Or via environment variable (both forms accept `1.4.0` and `v1.4.0`). Put the variable **before** `bash`, not before `curl`:
 
 ```bash
-ALLOY_PROVISIONER_VERSION=1.2.3 curl -fsSL https://alloy-it.io/install.sh | bash
+curl -fsSL https://alloy-it.io/install.sh | ALLOY_PROVISIONER_VERSION=1.4.0 bash
 ```
+
+The form `ALLOY_PROVISIONER_VERSION=1.4.0 curl … | bash` sets the variable only for `curl` and does **not** pin the version.
 
 When running the script directly:
 
@@ -99,16 +101,16 @@ The script auto-detects your architecture and installs the binary to `/usr/local
 
 ```bash
 # Positional argument form (recommended for curl | bash)
-curl -fsSL https://alloy-it.io/install.sh | bash -s -- 1.2.3
+curl -fsSL https://alloy-it.io/install.sh | bash -s -- 1.4.0
 
 # Environment variable form
-ALLOY_PROVISIONER_VERSION=1.2.3 curl -fsSL https://alloy-it.io/install.sh | bash
+curl -fsSL https://alloy-it.io/install.sh | ALLOY_PROVISIONER_VERSION=1.4.0 bash
 ```
 
 **Verify the install:**
 
 ```bash
-alloy-provisioner -version
+alloy-provisioner --version
 ```
 
 Prefer a manual install? Download `.deb` packages or tar.gz archives directly from the
@@ -136,7 +138,8 @@ All downloaded files are placed in a temporary directory that is cleaned up auto
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `ALLOY_PROVISIONER_VERSION` | *(latest)* | Install an exact version, e.g. `1.2.3` (overridden by positional arg) |
+| `ALLOY_PROVISIONER_VERSION` | *(latest)* | Install an exact version, e.g. `1.4.0` (overridden by positional arg) |
+| `ALLOY_REQUIRE_CHECKSUM` | unset | Set to `1` to abort when `checksums.txt` is missing |
 | `INSTALL_DIR` | `/usr/local/bin` | Override the installation directory |
 | `USE_DEB` | auto | Set to `1` to force `.deb`, `0` to force `tar.gz` |
 | `NO_COLOR` | unset | Set to any value to disable coloured output |

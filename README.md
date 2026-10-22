@@ -1,6 +1,26 @@
 # alloy-provisioner-releases
 
-Public release repository for **alloy-provisioner**: the Alloy guest VM provisioning engine. Binaries and packages are published here for download; the source code lives in a separate private repository.
+Public release repository for **alloy-provisioner**: the Alloy Linux provisioning CLI. Binaries and packages are published here for download; the source code lives in a separate private repository.
+
+## Bootstrap install (recommended)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/alloy-it/alloy-provisioner-releases/main/scripts/install.sh | bash
+```
+
+Pin **1.4.0** (current release):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/alloy-it/alloy-provisioner-releases/main/scripts/install.sh | bash -s -- 1.4.0
+```
+
+Or:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/alloy-it/alloy-provisioner-releases/main/scripts/install.sh | ALLOY_PROVISIONER_VERSION=1.4.0 bash
+```
+
+The installer verifies `checksums.txt` and aborts on mismatch. Set `ALLOY_REQUIRE_CHECKSUM=1` when a missing checksum file should be fatal. See [`scripts/README.md`](scripts/README.md).
 
 For a full walkthrough of features and usage see the **[User Guide](docs/user-guide.md)**.
 
@@ -29,11 +49,11 @@ Installs the binary to `/usr/local/bin/alloy-provisioner`.
 ```bash
 # amd64
 wget https://github.com/alloy-it/alloy-provisioner-releases/releases/download/<TAG>/alloy-provisioner_<VERSION>_linux_amd64.deb
-sudo dpkg -i alloy-provisioner_<VERSION>_linux_amd64.deb
+sudo apt-get install -y ./alloy-provisioner_<VERSION>_linux_amd64.deb
 
 # arm64
 wget https://github.com/alloy-it/alloy-provisioner-releases/releases/download/<TAG>/alloy-provisioner_<VERSION>_linux_arm64.deb
-sudo dpkg -i alloy-provisioner_<VERSION>_linux_arm64.deb
+sudo apt-get install -y ./alloy-provisioner_<VERSION>_linux_arm64.deb
 ```
 
 **Always latest (stable URLs):**
@@ -41,14 +61,14 @@ sudo dpkg -i alloy-provisioner_<VERSION>_linux_arm64.deb
 ```bash
 # amd64
 wget https://github.com/alloy-it/alloy-provisioner-releases/releases/download/latest/alloy-provisioner_latest_linux_amd64.deb
-sudo dpkg -i alloy-provisioner_latest_linux_amd64.deb
+sudo apt-get install -y ./alloy-provisioner_latest_linux_amd64.deb
 
 # arm64
 wget https://github.com/alloy-it/alloy-provisioner-releases/releases/download/latest/alloy-provisioner_latest_linux_arm64.deb
-sudo dpkg -i alloy-provisioner_latest_linux_arm64.deb
+sudo apt-get install -y ./alloy-provisioner_latest_linux_arm64.deb
 ```
 
-Replace `<TAG>` with a release tag (e.g. `v1.2.3`) and `<VERSION>` with the numeric version (e.g. `1.2.3`).
+Replace `<TAG>` with a release tag including the `v` prefix (e.g. `v1.4.0`) and `<VERSION>` with the numeric version (e.g. `1.4.0`). URLs without `v` return 404.
 
 ### Option 2: Tar.gz archive
 
@@ -76,7 +96,7 @@ chmod +x /usr/local/bin/alloy-provisioner
 **Verify:**
 
 ```bash
-alloy-provisioner -version
+alloy-provisioner --version
 ```
 
 Optional: verify checksums using `checksums.txt` from the same release before unpacking or installing.
@@ -104,7 +124,7 @@ Default blueprint directory is `$HOME/.alloy-it` (or `.` if home cannot be deter
 ./alloy-provisioner
 
 # Specify blueprint directory
-./alloy-provisioner -blueprint-dir /path/to/your/blueprint
+./alloy-provisioner --blueprint-dir /path/to/your/blueprint
 
 # Or set once via environment
 export ALLOY_BLUEPRINT_DIR=/path/to/your/blueprint
@@ -150,8 +170,8 @@ alloy-provisioner does **not** load a `.env` file itself; it only reads variable
 
 | Variable                  | Purpose                                                                                                              |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `ALLOY_BLUEPRINT_DIR`     | Blueprint directory (overridden by `-blueprint-dir`).                                                                |
-| `ALLOY_REGISTRY`          | Registry URL when using `-pull` (overridden by `-registry`). Default: `api.alloy-it.io` (public community registry). |
+| `ALLOY_BLUEPRINT_DIR`     | Blueprint directory (overridden by `--blueprint-dir`).                                                                |
+| `ALLOY_REGISTRY`          | Registry URL for `install`/`clone` (overridden by `--registry`). Default: `api.alloy-it.io` (public community registry). |
 | `ALLOY_REGISTRY_USERNAME` | Username for a **private** registry (only needed when pulling from non-public registries).                           |
 | `ALLOY_REGISTRY_PASSWORD` | Password or token for a **private** registry (only needed when pulling from non-public registries).                  |
 | Any other vars            | Merged into blueprint global vars; useful for task expansion (e.g. `GITLAB_TOKEN`, `SDK_DESTINATION`).               |
@@ -172,9 +192,9 @@ alloy-provisioner clone --list community
 **Clone (inspect before installing):**
 
 ```bash
-alloy-provisioner clone community/nordic/nrf91:1.1.3 --output ./my-blueprint
-# inspect files, then:
-sudo alloy-provisioner install --blueprint-dir ./my-blueprint
+alloy-provisioner clone community/nordic/nrf91:1.1.3
+# files under ~/.alloy-it/blueprints/ — inspect, then:
+sudo alloy-provisioner install --blueprint-dir ~/.alloy-it/blueprints/community/nordic/nrf91
 ```
 
 **Pull and run immediately:**
@@ -191,7 +211,7 @@ set -a && source "$HOME/.alloy-it/.env" && set +a
 sudo alloy-provisioner install myproject/my-blueprint:1.0.0 --registry my-registry.example.com
 ```
 
-Legacy flags `-pull`, `-repository`, `-tag` are still accepted but the `install` and `clone` subcommands are preferred.
+Use `install` and `clone` subcommands (not legacy single-dash pull flags).
 
 ---
 
@@ -202,6 +222,7 @@ Legacy flags `-pull`, `-repository`, `-tag` are still accepted but the `install`
 | `install [name[:tag]]`           | Pull a blueprint from the registry and run it; or run a local blueprint with `--blueprint-dir`. |
 | `clone <name[:tag]>`             | Pull blueprint files locally without running them.                        |
 | `clone --list <project>`         | List all blueprints available in a registry project (no auth required for `community`). |
+| `check`                          | URL preflight without provisioning.                                      |
 | `catalog update`                 | Clone/pull the alloy-catalog repo into `~/.alloy-it/catalog/`.           |
 | `catalog search <query>`         | Search toolchain descriptors by ID, name, or tag.                        |
 | `catalog info <id[@version]>`    | Show versions, providers, and platform assets for a toolchain.           |
@@ -220,7 +241,8 @@ Legacy flags `-pull`, `-repository`, `-tag` are still accepted but the `install`
 | `--docker`            | Activate the `docker` environment tag (skips tasks with `exclude: [docker]`).              | `false`                  |
 | `--wsl2`              | Activate the `wsl2` environment tag (skips tasks with `exclude: [wsl2]`).                  | `false`                  |
 | `--version`           | Print version and exit.                                                                     | —                        |
-| `-pull`, `-repository`, `-tag` | **Deprecated legacy flags.** Use `install`/`clone` subcommands instead.          | —                        |
+| `--preflight`         | Run URL reachability checks during `install`.                                               | `false`                  |
+| `--dry-run`           | Validate and print execution plan without running tasks.                                    | `false`                  |
 
 ---
 
